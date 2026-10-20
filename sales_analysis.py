@@ -1,87 +1,65 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Create sample sales data
+# 1. Create sample sales data
 data = {
     "Product": ["Laptop", "Phone", "Tablet", "Headphones", "Keyboard"],
     "Units_Sold": [10, 25, 15, 30, 20],
-    "Price": [50000, 20000, 15000, 2000, 1500]
+    "Price": [50000, 20000, 15000, 2000, 1500],
+    "Cost_Per_Unit": [35000, 14000, 10000, 1200, 800]
 }
 
 df = pd.DataFrame(data)
 
-# Calculate revenue
-df["Revenue"] = df["Units_Sold"] * df["Price"]
 
-# Calculate cost per unit
-df["Cost_Per_Unit"] = [35000, 14000, 10000, 1200, 800]
+# 2. Validate the data
+def validate_data(df):
+    if df.empty:
+        raise ValueError("Sales data cannot be empty.")
 
-# Calculate profit
-df["Profit"] = df["Units_Sold"] * (
-    df["Price"] - df["Cost_Per_Unit"]
-)
+    if df["Product"].isna().any():
+        raise ValueError("Product names cannot be empty.")
 
-# Display sales data
-print("SALES DATA")
-print(df)
+    numeric_columns = [
+        "Units_Sold", "Price", "Cost_Per_Unit"
+    ]
 
-# Display profit by product
-print("\nProfit by Product:")
-print(df[["Product", "Revenue", "Profit"]])
+    if df[numeric_columns].isna().any().any():
+        raise ValueError("Numeric values cannot be empty.")
 
-# Calculate total revenue
-total_revenue = df["Revenue"].sum()
-print("\nTotal Revenue:", total_revenue)
+    if (df["Units_Sold"] < 0).any():
+        raise ValueError("Units sold cannot be negative.")
 
-# Calculate total profit
-total_profit = df["Profit"].sum()
-print("Total Profit:", total_profit)
+    if (df[["Price", "Cost_Per_Unit"]] < 0).any().any():
+        raise ValueError("Prices and costs cannot be negative.")
 
-# Find the best-selling product
-best_selling = df.loc[df["Units_Sold"].idxmax(), "Product"]
-print("Best-Selling Product:", best_selling)
+    print("Data validation successful!")
 
-# Find the product with the highest revenue
-top_revenue = df.loc[df["Revenue"].idxmax(), "Product"]
-print("Highest Revenue Product:", top_revenue)
 
-# Create a revenue chart
-plt.figure()
-plt.bar(df["Product"], df["Revenue"])
-plt.title("Revenue by Product")
-plt.xlabel("Product")
-plt.ylabel("Revenue (₹)")
-plt.xticks(rotation=30)
-plt.tight_layout()
-plt.savefig("revenue_by_product.png")
-plt.show()
+# 3. Calculate revenue, profit, and profit margin
+def analyze_sales(df):
+    df = df.copy()
 
-# Create a profit chart
-plt.figure()
-plt.bar(df["Product"], df["Profit"])
-plt.title("Profit by Product")
-plt.xlabel("Product")
-plt.ylabel("Profit (₹)")
-plt.xticks(rotation=30)
-plt.tight_layout()
-plt.savefig("profit_by_product.png")
-plt.show()
+    df["Revenue"] = df["Units_Sold"] * df["Price"]
 
-# Calculate profit margin percentage
-df["Profit_Margin_%"] = (
-    df["Profit"] / df["Revenue"]
-) * 100
+    df["Profit"] = (
+        df["Units_Sold"] *
+        (df["Price"] - df["Cost_Per_Unit"])
+    )
 
-print("\nProfit Margin by Product:")
-print(df[["Product", "Profit_Margin_%"]].round(2))
+    df["Profit_Margin_%"] = 0.0
 
-# Find the product with the highest profit margin
-top_margin = df.loc[
-    df["Profit_Margin_%"].idxmax(), "Product"
-]
-print("\nHighest Profit Margin Product:", top_margin)
+    nonzero_revenue = df["Revenue"] != 0
 
-# Classify products based on profit
+    df.loc[nonzero_revenue, "Profit_Margin_%"] = (
+        df.loc[nonzero_revenue, "Profit"]
+        / df.loc[nonzero_revenue, "Revenue"] * 100
+    )
+
+    return df
+
+
+# 4. Classify product performance
 def classify_profit(profit):
     if profit >= 100000:
         return "High Profit"
@@ -90,25 +68,50 @@ def classify_profit(profit):
     else:
         return "Low Profit"
 
+
+# 5. Run the analysis
+validate_data(df)
+df = analyze_sales(df)
+
 df["Profit_Category"] = df["Profit"].apply(classify_profit)
 
-print("\nProduct Performance Summary:")
+print("\nSALES DATA")
+print(df)
+
+total_units = df["Units_Sold"].sum()
+total_revenue = df["Revenue"].sum()
+total_profit = df["Profit"].sum()
+average_margin = df["Profit_Margin_%"].mean()
+
+best_selling = df.loc[
+    df["Units_Sold"].idxmax(), "Product"
+]
+
+highest_revenue = df.loc[
+    df["Revenue"].idxmax(), "Product"
+]
+
+highest_profit = df.loc[
+    df["Profit"].idxmax(), "Product"
+]
+
+print("\nPRODUCT PERFORMANCE")
 print(df[["Product", "Profit", "Profit_Category"]])
 
-# Calculate summary values
-total_units = df["Units_Sold"].sum()
-average_profit_margin = df["Profit_Margin_%"].mean()
+print("\nSALES SUMMARY REPORT")
+print("Total Products:", len(df))
+print("Total Units Sold:", total_units)
+print("Total Revenue: Rs.", total_revenue)
+print("Total Profit: Rs.", total_profit)
+print("Average Profit Margin:", round(average_margin, 2), "%")
+print("Best-Selling Product:", best_selling)
+print("Highest Revenue Product:", highest_revenue)
+print("Highest Profit Product:", highest_profit)
 
-# Find the product with the highest profit
-highest_profit = df.loc[df["Profit"].idxmax(), "Product"]
 
-# Save analysis results to a CSV file
+# 6. Save analysis results
 df.to_csv("sales_analysis_results.csv", index=False)
 
-print("\nAnalysis results saved successfully!")
-print("File: sales_analysis_results.csv")
-
-# Save the sales summary as a text file
 with open("sales_summary.txt", "w") as file:
     file.write("SALES SUMMARY REPORT\n")
     file.write("====================\n")
@@ -116,14 +119,33 @@ with open("sales_summary.txt", "w") as file:
     file.write(f"Total Units Sold: {total_units}\n")
     file.write(f"Total Revenue: Rs. {total_revenue}\n")
     file.write(f"Total Profit: Rs. {total_profit}\n")
-    file.write(
-        f"Average Profit Margin: "
-        f"{average_profit_margin:.2f}%\n"
-    )
+    file.write(f"Average Profit Margin: {average_margin:.2f}%\n")
     file.write(f"Best-Selling Product: {best_selling}\n")
-    file.write(f"Highest Revenue Product: {top_revenue}\n")
+    file.write(f"Highest Revenue Product: {highest_revenue}\n")
     file.write(f"Highest Profit Product: {highest_profit}\n")
-    file.write(f"Highest Profit Margin Product: {top_margin}\n")
 
-print("\nSales summary saved to sales_summary.txt")
-print("\nAll sales analysis tasks completed successfully!")
+print("\nAnalysis results saved successfully!")
+
+
+# 7. Create and save the revenue chart
+plt.figure(figsize=(8, 5))
+plt.bar(df["Product"], df["Revenue"])
+plt.title("Revenue by Product")
+plt.xlabel("Product")
+plt.ylabel("Revenue (Rs.)")
+plt.xticks(rotation=30)
+plt.tight_layout()
+plt.savefig("revenue_by_product.png")
+plt.show()
+
+
+# 8. Create and save the profit chart
+plt.figure(figsize=(8, 5))
+plt.bar(df["Product"], df["Profit"])
+plt.title("Profit by Product")
+plt.xlabel("Product")
+plt.ylabel("Profit (Rs.)")
+plt.xticks(rotation=30)
+plt.tight_layout()
+plt.savefig("profit_by_product.png")
+plt.show()
