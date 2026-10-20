@@ -1,0 +1,6 @@
+Product,Units_Sold,Price,Revenue,Cost_Per_Unit,Profit,Profit_Margin_%,Profit_Category
+Laptop,10,50000,500000,35000,150000,30.0,High Profit
+Phone,25,20000,500000,14000,150000,30.0,High Profit
+Tablet,15,15000,225000,10000,75000,33.33333333333333,Medium Profit
+Headphones,30,2000,60000,1200,24000,40.0,Low Profit
+Keyboard,20,1500,30000,800,14000,46.666666666666664,Low Profit
