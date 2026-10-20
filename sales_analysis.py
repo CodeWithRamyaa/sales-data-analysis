@@ -9,6 +9,31 @@ data = {
 }
 
 df = pd.DataFrame(data)
+import pandas as pd
+import matplotlib.pyplot as plt
+
+data = {
+    "Product": ["Laptop", "Phone", "Tablet", "Headphones", "Keyboard"],
+    "Units_Sold": [10, 25, 15, 30, 20],
+    "Price": [50000, 20000, 15000, 2000, 1500]
+}
+
+df = pd.DataFrame(data)
+
+# NEW CODE: Calculate profit
+df["Cost_Per_Unit"] = [35000, 14000, 10000, 1200, 800]
+
+df["Profit"] = (
+    df["Units_Sold"] *
+    (df["Price"] - df["Cost_Per_Unit"])
+)
+
+# Original code continues here
+print("SALES DATA")
+print(df)
+
+print("\nProfit by Product:")
+print(df[["Product", "Revenue", "Profit"]])
 
 # Calculate revenue
 df["Revenue"] = df["Units_Sold"] * df["Price"]
