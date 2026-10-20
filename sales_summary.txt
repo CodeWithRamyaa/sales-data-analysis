@@ -1,0 +1,11 @@
+SALES SUMMARY REPORT
+====================
+Total Products: 5
+Total Units Sold: 100
+Total Revenue: Rs. 1315000
+Total Profit: Rs. 413000
+Average Profit Margin: 36.00%
+Best-Selling Product: Headphones
+Highest Revenue Product: Laptop
+Highest Profit Product: Laptop
+Highest Profit Margin Product: Keyboard
