@@ -60,3 +60,63 @@ plt.ylabel("Profit (₹)")
 plt.xticks(rotation=30)
 plt.tight_layout()
 plt.show()
+
+# Calculate profit margin percentage
+df["Profit_Margin_%"] = (
+    df["Profit"] / df["Revenue"]
+) * 100
+
+print("\nProfit Margin by Product:")
+print(df[["Product", "Profit_Margin_%"]].round(2))
+
+# Find the product with the highest profit margin
+top_margin = df.loc[
+    df["Profit_Margin_%"].idxmax(), "Product"
+]
+
+print("\nHighest Profit Margin Product:", top_margin)
+
+# Calculate profit margin percentage
+df["Profit_Margin_%"] = (
+    df["Profit"] / df["Revenue"]
+) * 100
+
+print("\nProfit Margin by Product:")
+print(df[["Product", "Profit_Margin_%"]].round(2))
+
+# Find the product with the highest profit margin
+top_margin = df.loc[
+    df["Profit_Margin_%"].idxmax(), "Product"
+]
+
+print("\nHighest Profit Margin Product:", top_margin)
+
+def classify_profit(profit):
+    if profit >= 100000:
+        return "High Profit"
+    elif profit >= 50000:
+        return "Medium Profit"
+    else:
+        return "Low Profit"
+
+df["Profit_Category"] = df["Profit"].apply(classify_profit)
+
+print("\nProduct Performance Summary:")
+print(df[["Product", "Profit", "Profit_Category"]])
+
+# Profit chart
+plt.bar(df["Product"], df["Profit"])
+plt.title("Profit by Product")
+plt.xlabel("Product")
+plt.ylabel("Profit (₹)")
+plt.xticks(rotation=30)
+plt.tight_layout()
+
+# Save analysis results to a CSV file
+df.to_csv("sales_analysis_results.csv", index=False)
+
+print("\nAnalysis results saved successfully!")
+print("File: sales_analysis_results.csv")
+
+plt.savefig("profit_by_product.png")
+plt.show()
