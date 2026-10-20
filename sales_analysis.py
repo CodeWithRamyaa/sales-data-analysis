@@ -149,3 +149,29 @@ plt.xticks(rotation=30)
 plt.tight_layout()
 plt.savefig("profit_by_product.png")
 plt.show()
+
+
+print("\nTESTING DATA VALIDATION")
+
+test_data = df.copy()
+test_data.loc[0, "Units_Sold"] = -5
+
+try:
+    validate_data(test_data)
+except ValueError as error:
+    print("Invalid data detected:", error)
+
+print("Validation test completed!")
+
+
+print("\nTESTING DATA VALIDATION")
+
+test_data = df.copy()
+test_data.loc[0, "Units_Sold"] = -5
+
+try:
+    validate_data(test_data)
+except ValueError as error:
+    print("Invalid data detected:", error)
+
+print("Validation test completed!")
